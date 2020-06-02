@@ -23,6 +23,10 @@ def diagnosis_login(myserial, username, password):
         resp = myserial.read(50)
         dbg_print(resp)
 
+        # previous result in this reading(not usually).
+        if b'# ' in resp:
+            return 2
+
         if b'login' in resp:
             dbg_print('Entering username {}'.format(username))
             myserial.write(username.encode() + b'\n')
@@ -39,7 +43,8 @@ def diagnosis_login(myserial, username, password):
                 elif b'login' in resp:
                     return 1
                 else:
-                    # result is not back
+                    # result is not back, read again.
+                    # but second reading enters "login phase", the next password will try to login twice.
                     resp = myserial.read(80)
                     dbg_print(resp)
             else:
@@ -85,6 +90,7 @@ def main():
         line = line.replace('\r', '')
         line = line.replace('\n', '')
 
+        print('-------------------------------------')
         print(i, line)
         i = i + 1
 
