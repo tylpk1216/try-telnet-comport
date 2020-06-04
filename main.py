@@ -1,5 +1,9 @@
 import serial
+
+import os
 import sys
+
+logger = None
 
 # Thanks Happzy's dpt-tools project.
 def connect_to_diagnosis(ttyName):
@@ -23,7 +27,7 @@ def diagnosis_login(myserial, username, password):
         resp = myserial.read(50)
         dbg_print(resp)
 
-        # previous result in this reading(not usually).
+        # The previous result is in this reading(not usually).
         if b'# ' in resp:
             return 2
 
@@ -38,13 +42,13 @@ def diagnosis_login(myserial, username, password):
                 resp = myserial.read(80)
                 dbg_print(resp)
 
-                if b'# ' in resp:
-                    return 2
-                elif b'login' in resp:
+                if b'incorrect' in resp:
                     return 1
+                elif b'# ' in resp:
+                    return 2
                 else:
-                    # result is not back, read again.
-                    # but second reading enters "login phase", the next password will try to login twice.
+                    # The result is not back, read again.
+                    # But second reading enters "login phase", the next password will try to login twice.
                     resp = myserial.read(80)
                     dbg_print(resp)
             else:
@@ -66,7 +70,11 @@ def err_print(content):
     print("[error] {}".format(content))
 
 def dbg_print(content):
-    print("[debug] {}".format(content))
+    s = "[debug] {}".format(content)
+    print(s)
+
+    global logger
+    logger.write(s)
 
 def main():
     # linux is /dev/ttyACMX
@@ -80,12 +88,19 @@ def main():
     if myserial == None:
         sys.exit()
 
+    global logger
+    logger = open('Log.txt', 'a')
+
     f = open(password_file, 'r')
     lines = f.readlines()
     f.close()
 
     i = 1
     for line in lines:
+        # ecsape
+        if os.path.isfile('QUIT'):
+            break
+
         # remove \r\n
         line = line.replace('\r', '')
         line = line.replace('\n', '')
@@ -98,12 +113,17 @@ def main():
         while res == 0:
             res = diagnosis_login(myserial, account, line)
 
+        logger.flush()
+
         if res == 2:
             print('\r\n\r\n')
             print('--------------------')
             print('Password is ', line)
             print('--------------------')
             break
+
+    logger.close()
+    myserial.close()
 
 if __name__ == '__main__':
     main()
