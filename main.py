@@ -91,12 +91,24 @@ def main():
     global logger
     logger = open('Log.txt', 'a')
 
+    start_index = 3000
+    logger.write('start_index: %d \n' % start_index)
+
     f = open(password_file, 'r')
     lines = f.readlines()
     f.close()
 
     i = 1
-    for line in lines:
+    for j in range(len(lines)):
+        # random mode
+        #line = lines[start_index+j]
+
+        # asc mode
+        line = lines[j]
+
+        # desc mode
+        line = lines[-1-j]
+
         # ecsape
         if os.path.isfile('QUIT'):
             break
@@ -122,7 +134,9 @@ def main():
             print('--------------------')
             break
 
+    logger.write('-------------------------------------\n\n')
     logger.close()
+
     myserial.close()
 
 if __name__ == '__main__':
