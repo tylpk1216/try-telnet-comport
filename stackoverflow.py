@@ -37,7 +37,7 @@ def diagnosis_login(myserial, username, password):
             resp = myserial.read(50)
             dbg_print(resp)
             if b'Password' in resp:
-                dbg_print('Entering password {}'.format(password))
+                #dbg_print('Entering password {}'.format(password))
                 myserial.write(password + b'\n')
                 resp = myserial.read(80)
                 dbg_print(resp)
@@ -92,12 +92,13 @@ def main():
 
     one = [0xFF];
 
-    for i in range(10000):
+    for i in range(1662, 10000, 1):
         line = bytes(one * (i+1))
 
         print('-------------------------------------')
-        print(i, line)
-
+        #print(i, line)
+        print(i)
+        
         res = 0
         while res == 0:
             res = diagnosis_login(myserial, account, line)
