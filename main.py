@@ -109,10 +109,6 @@ def main():
         # desc mode
         line = lines[-1-j]
 
-        # ecsape
-        if os.path.isfile('QUIT'):
-            break
-
         # remove \r\n
         line = line.replace('\r', '')
         line = line.replace('\n', '')
@@ -132,6 +128,10 @@ def main():
             print('--------------------')
             print('Password is ', line)
             print('--------------------')
+            break
+
+        # ecsape
+        if os.path.isfile('QUIT'):
             break
 
     logger.write('-------------------------------------\n\n')
